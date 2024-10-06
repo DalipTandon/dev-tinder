@@ -1,26 +1,18 @@
 const express=require("express");
 const app=express();
+const {adminAuthentication,userAuthentication}=require("./middlewares/auth");
 
-
-app.get("/profile",(req,res,next)=>{
-    console.log("first route");
-    
-    // res.send("hello from server profile1");
-    next();
-    
-},(req,res,next)=>{
-    console.log("second route");
-
-    // res.send("hello from server profile2");
-    next();
-
-},(req,res,next)=>{
-    console.log("third route");
-
-    res.send("hello from server profile3");
-
+app.use("/admin",adminAuthentication);
+app.get("/admin/getAllData",(req,res)=>{
+    res.send("All data fetched successfully");
 })
-
+app.get("/admin/deleteAllData",(req,res)=>{
+    res.send("All data deleted successfully");
+})
+app.get("/user/getAllData",userAuthentication,(req,res)=>{
+    res.send("All user data fetched successfully");
+   
+})
 
 app.listen(3000,()=>{
     console.log("Server is started at port number 3000");
