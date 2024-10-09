@@ -12,7 +12,7 @@ app.post("/signup",async(req,res)=>{
         await user.save();
         res.send("new user is created");
     }catch(err){
-        res.status(400).send("contact support team");
+        res.status(400).send("contact support team"+err.message);
     }
 
 })
@@ -55,10 +55,12 @@ app.patch("/user",async(req,res)=>{
     const userId=req.body.userId;
     const data=req.body;
     try{
-        await User.findByIdAndUpdate({_id:userId},data);
+        await User.findByIdAndUpdate({_id:userId},data,{
+            runValidators:true,
+        });
         res.send("user data updated successfully");
     }catch(err){
-        res.status(404).send("something went wrong");
+        res.status(404).send(err.message);
     }
 })
 connectDB().then(()=>{
