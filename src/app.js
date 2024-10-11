@@ -51,16 +51,24 @@ app.delete("/user",async(req,res)=>{
         res.status(404).send("something went wrong");
     }
 })
-app.patch("/user",async(req,res)=>{
-    const userId=req.body.userId;
+app.patch("/user/:userId",async(req,res)=>{
+    const userId=req.params.userId;
     const data=req.body;
     try{
+        const IsAllowed=["firstName","lastName","emailId","age","gender","skills","profilUrl","password"];
+        const isUpdateAllowed=Object.keys(data).every((k)=>IsAllowed.includes(k));
+        if(!isUpdateAllowed){
+            throw new Error("update not allowed");
+        }
+        if(data.skills?.length >10){
+            throw new Error("Skill limit exceeded")
+        }
         await User.findByIdAndUpdate({_id:userId},data,{
             runValidators:true,
         });
         res.send("user data updated successfully");
     }catch(err){
-        res.status(404).send(err.message);
+        res.status(404).send("Update failed :"+err.message);
     }
 })
 connectDB().then(()=>{
