@@ -4,10 +4,15 @@ const connectDB=require("./config/databse");
 const User=require("./models/user");
 const {signupValidation}=require("./utils/validation");
 const { model } = require("mongoose");
-const bcrypt = require('bcrypt');
-const validator=require("validator");
-
+const bcrypt = require('bcrypt'); // password encryption
+const validator=require("validator"); //npm library for validations
+const cookieParser=require("cookie-parser"); //npm library for reading cookies
+const jwt = require('jsonwebtoken'); //for jwttokens
+const{userAuthentication}=require("./middlewares/auth");
 app.use(express.json());  //middleware to read  json data provided by express js
+app.use(cookieParser());
+
+
 app.post("/signup",async(req,res)=>{
    // console.log(req.body); //req.body is used to read data send via api 
     try{
@@ -38,10 +43,12 @@ app.post("/login",async(req,res)=>{
         throw new Error("Invalid credentails");
     }
     const isPassword=await bcrypt.compare(password,user.password);
-    if(!isPassword){
+    if(isPassword){
+        var token = await jwt.sign({ _id: user._id }, "DEVTinder@1234hds",{expiresIn:"7d"});
+        res.cookie("token",token);
+        res.send("login successfull")   
+     }else{
         throw new Error("invalid credentails")
-    }else{
-        res.send("login successfull")
     }
     
 }catch(error){
@@ -50,66 +57,22 @@ app.post("/login",async(req,res)=>{
 })
 
 
-app.get("/user",async(req,res)=>{
-    const userEmail=req.body.emailId;
+app.get("/profile",userAuthentication,async (req,res)=>{
     try{
-        const user= await User.find({emailId:userEmail});
-        if(user.length===0){
-            res.status(404).send("user not found");
-        }else{
-            res.send(user);
-        }
-    }catch(err){
-        res.send("something went wrond");
-    }
-})
-
-
-app.get("/feed",async(req,res)=>{
-    try{
-        const users=await User.find({});
-        res.send(users);
-    }catch(err){
-        res.status(404).send("something went wrong");
-    }
-})
-
-
-app.delete("/user",async(req,res)=>{
-    // const user=req.body.emailId; deleting user based on email id
-    const user=req.body.userId;
-    console.log(user);
+    const user=req.user;
     
-    try{
-        // await User.deleteOne({emailId:user}); deleting user basedon emailid
-      await User.findByIdAndDelete(user);//deleting user by unique id
-        res.send("User deleted successfully");
-    }catch (error){
-        res.status(404).send("something went wrong");
+    res.send(user);
+    
+    }catch(error){
+        res.status(400).send("ERROR :"+error.message);
     }
+    
+    
 })
 
-
-
-app.patch("/user/:userId",async(req,res)=>{
-    const userId=req.params.userId;
-    const data=req.body;
-    try{
-        const IsAllowed=["firstName","lastName","emailId","age","gender","skills","profilUrl","password"];
-        const isUpdateAllowed=Object.keys(data).every((k)=>IsAllowed.includes(k));
-        if(!isUpdateAllowed){
-            throw new Error("update not allowed");
-        }
-        if(data.skills?.length >10){
-            throw new Error("Skill limit exceeded")
-        }
-        await User.findByIdAndUpdate({_id:userId},data,{
-            runValidators:true,
-        });
-        res.send("user data updated successfully");
-    }catch(err){
-        res.status(404).send("Update failed :"+err.message);
-    }
+app.post("/sendConnectionRequest",userAuthentication,async(req,res)=>{
+    const user=req.user;
+    res.send(user.firstName  +" sent connecton sent!!!!");
 })
 
 

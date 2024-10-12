@@ -1,23 +1,29 @@
-const adminAuthentication=(req,res,next)=>{
-    const token="xyz";
-    const authorizedToken=token==="xyz";
-    if(!authorizedToken){
-        res.status(401).send("Not authorized");
-    }else{
-       next();
+const jwt =require("jsonwebtoken");
+const User=require("../models/user");
+const userAuthentication=async(req,res,next)=>{
+
+
+  try{ const cookies=req.cookies;
+
+    const{token}=cookies;
+    if(!token){
+        throw new Error("Invalid token");
     }
+    const isToken=await jwt.verify(token,"DEVTinder@1234hds");
+     
+     const {_id}=isToken;
+    const user=await User.findById(_id);
+    if(!user){
+        throw new Error("user does't exist");
+    }
+    req.user=user;
+    next();
+}catch(error){
+    res.status(400).send("ERROR :"+error.message);
 }
-const userAuthentication=(req,res,next)=>{
-    const token="xyz";
-    const authorizedToken=token==="xyz";
-    if(!authorizedToken){
-        res.status(401).send("Not authorized");
-    }else{
-       next();
-    }
 }
 
 
 module.exports={
-adminAuthentication,userAuthentication,
+userAuthentication,
 }
