@@ -12,10 +12,10 @@ authRouter.post("/signup",async(req,res)=>{
     // console.log(req.body); //req.body is used to read data send via api 
      try{
          signupValidation(req);
-         const{firstName,lastName,emailId,password}=req.body;
+         const{firstName,lastName,emailId,password,age,skills,gender}=req.body;
          const hashPassword=await bcrypt.hash(password,10);
          const user=new User({
-             firstName,lastName,emailId,password:hashPassword ,   //adding data via post api
+             firstName,lastName,emailId,password:hashPassword,age,skills,gender    //adding data via post api
          });
          await user.save();
          res.send("new user is created");
