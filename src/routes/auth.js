@@ -41,7 +41,10 @@ authRouter.post("/signup",async(req,res)=>{
      if(isPassword){
          var token = await jwt.sign({ _id: user._id }, "DEVTinder@1234hds",{expiresIn:"7d"});
          res.cookie("token",token);
-         res.send("login successfull")   
+         res.json({
+            message:"login successful",
+            data:user
+         })   
       }else{
          throw new Error("invalid credentails")
      }

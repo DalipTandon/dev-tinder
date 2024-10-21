@@ -3,6 +3,12 @@ const app=express();
 const connectDB=require("./config/databse");
 const { model } = require("mongoose");
 const cookieParser = require('cookie-parser')
+const cors=require("cors");
+
+app.use(cors({
+    origin:"http://localhost:5173",
+    credentials:true
+}));
 app.use(express.json());  //middleware to read  json data provided by express js
 app.use(cookieParser());
 
