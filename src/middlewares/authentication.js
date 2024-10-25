@@ -7,7 +7,9 @@ const userAuthentication=async(req,res,next)=>{
 
     const{token}=cookies;
     if(!token){
-        throw new Error("Invalid token");
+        return res.status(401).send({
+            message:"you are not logged in"
+        });
     }
     const isToken=await jwt.verify(token,"DEVTinder@1234hds");
      

@@ -12,16 +12,21 @@ authRouter.post("/signup",async(req,res)=>{
     // console.log(req.body); //req.body is used to read data send via api 
      try{
          signupValidation(req);
-         const{firstName,lastName,emailId,password,age,skills,gender}=req.body;
+         const{firstName,lastName,emailId,password,age,skills,gender,profilUrl}=req.body;
          const hashPassword=await bcrypt.hash(password,10);
          const user=new User({
-             firstName,lastName,emailId,password:hashPassword,age,skills,gender    //adding data via post api
+             firstName,lastName,emailId,password:hashPassword,age,//adding data via post api
          });
-         await user.save();
-         res.send("new user is created");
-     }catch(err){
-         res.status(400).send("ERROR: "+err.message);
-     }
+        const savedUser= await user.save();
+         var token = await jwt.sign({ _id: user._id }, "DEVTinder@1234hds",{expiresIn:"7d"});
+         res.cookie("token", token, {
+            expires: new Date(Date.now() + 8 * 3600000),
+          });
+      
+          res.json({ message: "User Added successfully!", data: savedUser });
+        } catch (err) {
+          res.status(400).send("ERROR : " + err.message);
+        }
  
  })
  

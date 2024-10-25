@@ -5,7 +5,7 @@ const connectionRequest=require("../models/connectionRequest");
 const User =require("../models/user")
 
 
-const SECRET_DATA="firstName lastName gender age skills about"
+const SECRET_DATA="firstName lastName gender age skills about profilUrl"
 userRouter.get("/user/request/received",userAuthentication,async(req,res)=>{
     try{
 

@@ -14,7 +14,7 @@ if(!firstName || !lastName){
 }
 
 const validateProfileEdit=(req)=>{
-    const IsAllowed=["firstName","lastName","age","skills","about"];
+    const IsAllowed=["firstName","lastName","age","skills","about","gender","profilUrl"];
     const isEditFiled=Object.keys(req.body).every((key=>IsAllowed.includes(key)));
 
     return isEditFiled;

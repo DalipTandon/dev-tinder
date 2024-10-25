@@ -6,6 +6,7 @@ const userSchema=new mongoose.Schema({
         required:true,
         min:2,
         max:50,
+        unique:true,
     },
     lastName:{
         type:String,
@@ -15,7 +16,6 @@ const userSchema=new mongoose.Schema({
     emailId:{
         type:String,
         required:true,
-        trim:true,
         unique:true,
         trim:true,
         validate(value){
@@ -58,5 +58,7 @@ const userSchema=new mongoose.Schema({
         default:"This is my about",
     }
 },{timestamps:true});
+
+
 
 module.exports=mongoose.model("User",userSchema);
